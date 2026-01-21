@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    // Pass AWS credentials to Terraform
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')      // Jenkins global credential ID
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')     // Jenkins global credential ID
+    }
+
     stages {
 
         stage('Checkout Code') {
@@ -41,40 +47,3 @@ pipeline {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
