@@ -10,7 +10,7 @@ pipeline {
         // AWS credentials stored in Jenkins as 'aws-access-key' and 'aws-secret-key'
         AWS_ACCESS_KEY_ID     = credentials('aws-access-key')
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
-        TERRAFORM_BIN         = "/usr/local/bin/terraform" // Adjust if Terraform path is different
+        TERRAFORM_BIN         = "/usr/bin/terraform" // Correct path for your server
     }
 
     stages {
