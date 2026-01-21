@@ -7,10 +7,10 @@ pipeline {
     }
 
     environment {
-        // AWS credentials stored in Jenkins as 'aws-access-key' and 'aws-secret-key'
+        // AWS credentials stored in Jenkins (IDs: aws-access-key & aws-secret-key)
         AWS_ACCESS_KEY_ID     = credentials('aws-access-key')
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
-        TERRAFORM_BIN         = "/usr/bin/terraform" // Correct path for your server
+        TERRAFORM_BIN         = "/usr/bin/terraform" // Correct path for ARM64 Jenkins server
     }
 
     stages {
