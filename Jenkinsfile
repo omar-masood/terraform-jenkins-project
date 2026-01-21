@@ -1,49 +1,68 @@
 pipeline {
     agent any
 
-    // Pass AWS credentials to Terraform
+    // Optional: allow user to enter bucket name
+    parameters {
+        string(name: 'BUCKET_NAME', defaultValue: 'jenkins-terraform-demo', description: 'Name of the S3 bucket')
+    }
+
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')      // Jenkins global credential ID
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')     // Jenkins global credential ID
+        // AWS credentials stored in Jenkins as 'aws-access-key' and 'aws-secret-key'
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
+        TERRAFORM_BIN         = "/usr/local/bin/terraform" // Adjust if Terraform path is different
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/omar-masood/terraform-jenkins-project.git'
+                // Explicitly checkout main branch
+                git branch: 'main',
+                    url: 'https://github.com/omar-masood/terraform-jenkins-project.git'
             }
         }
 
         stage('Terraform Init') {
             steps {
-                sh 'terraform init'
+                sh "${env.TERRAFORM_BIN} init"
             }
         }
 
         stage('Terraform Validate') {
             steps {
-                sh 'terraform validate'
+                sh "${env.TERRAFORM_BIN} validate"
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan'
+                sh "${env.TERRAFORM_BIN} plan -var 'bucket_name=${params.BUCKET_NAME}'"
             }
         }
 
         stage('Approval') {
             steps {
-                input message: 'Do you want to apply this Terraform plan?',
-                      ok: 'Approve & Apply'
+                input message: 'Do you want to apply this Terraform plan?', ok: 'Approve & Apply'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                sh 'terraform apply'
+                sh "${env.TERRAFORM_BIN} apply -var 'bucket_name=${params.BUCKET_NAME}'"
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished!'
+        }
+        success {
+            echo 'Terraform applied successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check logs for errors.'
         }
     }
 }
